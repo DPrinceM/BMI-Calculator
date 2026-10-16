@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BMI & Nutrition Calculator</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#172033;background:#f3f6fb}
+*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#145c52,#187b74);color:white;padding:28px 18px}
+header .wrap,main{max-width:1000px;margin:auto}h1{margin:0 0 8px;font-size:clamp(1.55rem,4vw,2.2rem)}header p{margin:0;opacity:.93}
+main{padding:20px 14px 40px}.panel{background:white;border-radius:16px;padding:20px;margin:0 0 18px;box-shadow:0 5px 22px #1d35570c}
+h2{margin:0 0 15px;font-size:1.25rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+label{display:block;font-weight:650;font-size:.92rem;margin-bottom:6px}input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;background:white;font:inherit}
+input:focus,select:focus{outline:3px solid #b8e5dc;border-color:#187b74}.hint{font-size:.8rem;color:#64748b;margin-top:5px}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.metric{background:#f1f8f6;border:1px solid #d8eee8;border-radius:12px;padding:14px}.metric .name{font-size:.82rem;color:#536576}.metric .value{font-size:1.45rem;font-weight:750;margin-top:5px;overflow-wrap:anywhere}.metric .unit{font-size:.8rem;color:#536576}
+.notice{background:#fff8e8;border-left:4px solid #d99a18;padding:12px 14px;border-radius:8px;color:#5c4718;font-size:.9rem;line-height:1.5}
+.foodgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.food{border:1px solid #e2e8f0;border-radius:12px;padding:14px}.food h3{margin:0 0 7px;font-size:1rem;color:#145c52}.food p{margin:6px 0;font-size:.9rem;line-height:1.45}.muted{color:#64748b;font-size:.84rem;line-height:1.5}footer{text-align:center;color:#64748b;padding:4px 18px 28px;font-size:.82rem}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>BMI & Daily Nutrition Calculator</h1><p>Enter your details for estimated BMI, weight goals, calories, and daily macronutrients.</p></div></header>
+<main>
+<section class="panel">
+<h2>Your details</h2>
+<div class="grid">
+<div><label for="weight">Body weight (kg)</label><input id="weight" type="number" min="1" max="500" step=".1" value="70"></div>
+<div><label for="height">Height (cm)</label><input id="height" type="number" min="50" max="260" step=".1" value="170"></div>
+<div><label for="age">Age (years)</label><input id="age" type="number" min="18" max="120" step="1" value="30"><div class="hint">For adults 18 and older.</div></div>
+<div><label for="sex">Sex used in calorie equation</label><select id="sex"><option>Female</option><option selected>Male</option></select></div>
+<div><label for="activity">Activity level</label><select id="activity"><option value="1.2">Sedentary</option><option value="1.375">Light</option><option value="1.55" selected>Moderate</option><option value="1.725">Very active</option><option value="1.9">Extra active</option></select></div>
+<div><label for="goal">Goal</label><select id="goal"><option value="Lose weight" selected>Lose weight</option><option value="Maintain weight">Maintain weight</option><option value="Gain weight">Gain weight</option></select></div>
+<div><label for="targetBMI">Target BMI</label><input id="targetBMI" type="number" min="18.5" max="35" step=".1" value="24.9"><div class="hint">For many adults, 18.5–24.9 is the usual reference range.</div></div>
+</div>
+</section>
+<section class="panel">
+<h2>Your estimated results</h2>
+<div class="results">
+<div class="metric"><div class="name">BMI</div><div class="value" id="bmi">—</div><div class="unit">kg/m²</div></div>
+<div class="metric"><div class="name">BMI category</div><div class="value" id="category">—</div></div>
+<div class="metric"><div class="name">Weight at target BMI</div><div class="value" id="targetWeight">—</div><div class="unit">kg</div></div>
+<div class="metric"><div class="name">Weight change to target</div><div class="value" id="weightChange">—</div><div class="unit">kg (positive = weight to lose)</div></div>
+<div class="metric"><div class="name">Estimated resting calories (BMR)</div><div class="value" id="bmr">—</div><div class="unit">kcal/day</div></div>
+<div class="metric"><div class="name">Estimated maintenance calories</div><div class="value" id="maintenance">—</div><div class="unit">kcal/day</div></div>
+<div class="metric"><div class="name">Suggested calorie target</div><div class="value" id="calories">—</div><div class="unit">kcal/day</div></div>
+<div class="metric"><div class="name">Protein target</div><div class="value" id="protein">—</div><div class="unit">g/day</div></div>
+<div class="metric"><div class="name">Carbohydrate target</div><div class="value" id="carbs">—</div><div class="unit">g/day</div></div>
+<div class="metric"><div class="name">Estimated fat</div><div class="value" id="fat">—</div><div class="unit">g/day</div></div>
+<div class="metric"><div class="name">Suggested pace</div><div class="value" id="pace" style="font-size:1rem">—</div></div>
+</div>
+<p class="muted">These are general estimates, not a diagnosis or personalized medical prescription. Energy needs vary between people.</p>
+</section>
+<section class="panel">
+<h2>Food guide: practical choices</h2>
+<div class="foodgrid">
+<div class="food"><h3>Protein</h3><p><b>Foods:</b> eggs, beans, lentils, chickpeas, peas, shiro, milk/yogurt, fish, chicken, lean meat.</p><p>Include a protein source at main meals and rotate plant and animal sources as appropriate.</p></div>
+<div class="food"><h3>Carbohydrate & energy</h3><p><b>Foods:</b> teff injera, whole-grain bread, oats, maize, potatoes, sweet potatoes, rice, kocho.</p><p>Choose minimally processed, higher-fibre options where possible. Carbohydrates are not automatically unhealthy.</p></div>
+<div class="food"><h3>Vegetables</h3><p><b>Foods:</b> cabbage, kale/gomen, carrots, tomatoes, onions, spinach, seasonal vegetables.</p><p>When practical, aim to fill about half your plate with vegetables.</p></div>
+<div class="food"><h3>Fruit & fibre</h3><p><b>Foods:</b> orange, banana, papaya, avocado, seasonal fruit.</p><p>Choose whole fruit more often than juice; portion needs vary by individual.</p></div>
+<div class="food"><h3>Healthy fats</h3><p><b>Foods:</b> groundnuts, sesame, avocado, small amounts of vegetable oil.</p><p>Use modest portions and measure added oils if managing weight.</p></div>
+<div class="food"><h3>Hydration & balanced meals</h3><p>Drink safe water regularly. A meal example is injera with shiro or lentils and gomen, or egg with whole-grain bread and vegetables.</p><p>Adjust food choices to budget, availability, and health advice.</p></div>
+</div>
+</section>
+<div class="notice"><b>Health note:</b> BMI is a screening measure and does not distinguish muscle from fat. Calorie and macronutrient estimates can be inaccurate, especially during pregnancy or with illness, kidney/liver disease, diabetes medication, frailty, or a history of disordered eating. Do not use this calculator for children or adolescents. If you have a medical condition or are planning a major weight change, consult a qualified health professional.</div>
+</main>
+<footer>Educational tool only • Calculations happen in your browser; this page does not send entered values to a server.</footer>
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => Number.isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:1}) : "—";
+function calc(){
+ const w=+$("weight").value,h=+$("height").value,a=+$("age").value,t=+$("targetBMI").value;
+ if(!(w>0&&h>0&&a>=18&&t>0)){["bmi","category","targetWeight","weightChange","bmr","maintenance","calories","protein","carbs","fat","pace"].forEach(id=>$(id).textContent="Enter valid adult details");return}
+ const hm=h/100,bmi=w/(hm*hm),targetW=t*hm*hm,change=w-targetW;
+ const cat=bmi<18.5?"Underweight":bmi<25?"Healthy range":bmi<30?"Overweight":"Obesity range";
+ const bmr=10*w+6.25*h-5*a+($("sex").value==="Male"?5:-161);
+ const maintenance=bmr*+$("activity").value;
+ const goal=$("goal").value;
+ const calories=goal==="Lose weight"?Math.max(maintenance-500,1200):goal==="Gain weight"?maintenance+300:maintenance;
+ const protein=targetW*1.4,carbs=calories*.5/4,fat=Math.max(0,(calories-protein*4-carbs*4)/9);
+ $("bmi").textContent=fmt(bmi);$("category").textContent=cat;$("targetWeight").textContent=fmt(targetW);
+ $("weightChange").textContent=(change>0?fmt(change)+" to lose":change<0?fmt(Math.abs(change))+" to gain":"0");
+ $("bmr").textContent=fmt(bmr);$("maintenance").textContent=fmt(maintenance);$("calories").textContent=fmt(calories);
+ $("protein").textContent=fmt(protein);$("carbs").textContent=fmt(carbs);$("fat").textContent=fmt(fat);
+ $("pace").textContent=goal==="Lose weight"?"Aim for gradual change; often about 0.25–0.5 kg/week":goal==="Gain weight"?"Aim for gradual gain with strength activity":"Maintain weight and monitor trends";
+}
+["weight","height","age","sex","activity","goal","targetBMI"].forEach(id=>$(id).addEventListener("input",calc));
+calc();
+</script>
+</body></html>
